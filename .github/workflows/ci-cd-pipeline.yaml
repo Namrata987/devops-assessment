@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build and push Docker images
+        run: |
+          docker build -t my-dockerhub/react-frontend ./frontend
+          docker push my-dockerhub/react-frontend
+          docker build -t my-dockerhub/dotnet-backend ./backend
+          docker push my-dockerhub/dotnet-backend
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f ./frontend/deployment.yaml
+          kubectl apply -f ./frontend/service.yaml
+          kubectl apply -f ./backend/deployment.yaml
+          kubectl apply -f ./backend/service.yaml
